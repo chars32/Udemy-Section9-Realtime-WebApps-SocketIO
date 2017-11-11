@@ -1,32 +1,44 @@
-// Instanciamos el buit-in module path,
-// no se instala, viene con nodejs
 const path = require('path');
-
-// Hacemos uso de path y uniremos la ruta del archivo
-// y que suba (..) al archivo public.
 const publicPath = path.join(__dirname, '../public');
+// Llammaos a http para poder crear un server
+// este viene con nodejs
+const http = require('http');
+// Llamamos a socketIO
+const socketIO = require('socket.io');
 
-// Declaramos el port para Heroku
 const port = process.env.PORT || 3000;
 
-// Llamamos e instanciamos express
 const express = require('express');
 const app = express();
+// Creamos el server utilizando 
+// http.createServer y le pasamos
+// la app (express)
+var server = http.createServer(app);
+// Aqui a socketIO le pasamos el server,
+// este es el motivo por el cual usamos 
+// http. Asi ya podremos usar socketIO
+// en nuestro server.
+var io = socketIO(server);
 
-// Middleware para que express use la carpeta public
-// contenida en la const publicPath
 app.use(express.static(publicPath));
-
-app.listen(port, () => {
+// io.on sirve para escuchar un evento,
+// en este caso connection el cual espera
+// por una conexion y cuando recibe
+// el socket manda el mensaje. El socket 
+// es la conexión individual que cada 
+// cliente hace al server.
+io.on('connection', (socket) => {
+  console.log('New user connection')
+  // Le pasamos al socket que espere un evento
+  // disconnect, el cual indica que la pagina
+  // web ha sido cerrada
+  socket.on('disconnect', () => {
+    console.log('User was disconnected')
+  })
+})
+// Cambiamos a server en lugar de app
+// ya que le pasamos la app. FUncionan
+// de la misma manera.
+server.listen(port, () => {
   console.log(`Server is running port ${port}`);
 })
-
-// Esta es la version sin paquete 'path'
-// console.log(__dirname + './../public');
-// // Esta es la version con el paquete 'path'
-// console.log(publicPath);
-
-// setup express locally
-// create a brand new express aplication
-// configure express static middleware to serve public
-// app.listen = 3000, print 'app is run in port 3000' 

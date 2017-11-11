@@ -8,5 +8,23 @@
 </head>
 <body>
   <p>Welcome to the ChatApp</p>
+  <!-- En esta direccion tenemos la libreria js de socketio
+  para hacer las conexiones -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // inciamos conexion a un WebSocket
+    var socket = io();
+    // socket.on funciona igual que el io.on del lado del 
+    // server(server.js), solo cambia en el nombre del evento
+    // a connect ya que aqui es el lado del cliente
+    socket.on('connect', () => {
+      console.log('Connected to server')
+    });
+    // Cuando el servidor se apaga, lanzara el evento
+    // disconnect con el mensaje siguiente
+    socket.on('disconnect', () => {
+      console.log('Disconnected from server')
+    })
+  </script>
 </body>
 </html>
