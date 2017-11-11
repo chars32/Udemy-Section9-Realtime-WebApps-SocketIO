@@ -21,19 +21,17 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User was disconnected')
   })
-
-  socket.on('createMessage', (message) => {
-    console.log('createMessage', message);
-  // utilizamos la funcion generateMessage
-  // y le pasamos los parametros     
+  // recibimos como parametro ña funcion emitida 
+  // desde el cliente(callback)
+  socket.on('createMessage', (message, callback) => {
+    console.log('createMessage', message);     
     io.emit('newMessage', generateMessage(message.from, message.text));
+    // llamamos el callback y le pasamos un texto, el cual sera enviado
+    // como respuesta al cliente de que el server recibio el mensaje
+    callback('This is from the server');
   });
   // ---- from server to client ----
-  // utilizamos la funcion generateMessage
-  // y le pasamos los parametros
   socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
-  // utilizamos la funcion generateMessage
-  // y le pasamos los parametros
   socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
 })
 

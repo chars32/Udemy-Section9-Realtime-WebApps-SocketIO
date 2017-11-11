@@ -14,7 +14,14 @@ socket.on('newMessage', function (message){
 })
 
 // ---- from client to server ----
-// socket.emit('createMessage', {
-//   from: 'yolo@example.com',
-//   text: 'Something here'
-// })
+socket.emit('createMessage', {
+  from: 'Frank',
+  text: 'Something here'
+  // pasamos una funcion como tercer
+  // parametro en el emit(callback)
+  // la data es el texto que manda el callback
+  // desde el server, es decir la respuesta de 
+  // regreso del servidor. 
+}, function(data) {
+  console.log('Got it', data);
+});
