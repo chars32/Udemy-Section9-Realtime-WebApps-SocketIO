@@ -24,29 +24,24 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User was disconnected')
   })
-  // Recibimos el emit del cliente
-  socket.on('createEmail', (newEmail) => {
-    console.log('createEmail', newEmail);
-  });
 
-  socket.on('createMessage', (newMessage) => {
-    console.log('createMessage', newMessage);
+  socket.on('createMessage', (message) => {
+    console.log('createMessage', message);
+    // pasamos el evento newMessage y hacemos 
+    // el emit pasando el objeto con los datos
+    io.emit('newMessage', {
+      from: message.from,
+      text: message.text,
+      createdAt: new Date().getTime
+
+    })
   });
   // ---- from server to client ----
-  // emit sirve para emitir un envento al cliente
-  // se debe pasar el nombre del evento y la informacion
-  // que se requiera, en este caso un objeto.
-  socket.emit('newEmail', {
-    from: 'mike@example.com',
-    text: 'Hey. What is going on.',
-    createAt: 123
-  });
-
-  socket.emit('newMessage', {
-    from: 'alguien@example.com',
-    text: 'I sent you new message',
-    createAt: 456
-  })
+  // socket.emit('newMessage', {
+  //   from: 'alguien@example.com',
+  //   text: 'I sent you new message',
+  //   createAt: 456
+  // })
 })
 
 server.listen(port, () => {
