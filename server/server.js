@@ -1,44 +1,54 @@
 const path = require('path');
 const publicPath = path.join(__dirname, '../public');
-// Llammaos a http para poder crear un server
-// este viene con nodejs
+
 const http = require('http');
-// Llamamos a socketIO
+
 const socketIO = require('socket.io');
 
 const port = process.env.PORT || 3000;
 
 const express = require('express');
 const app = express();
-// Creamos el server utilizando 
-// http.createServer y le pasamos
-// la app (express)
-var server = http.createServer(app);
-// Aqui a socketIO le pasamos el server,
-// este es el motivo por el cual usamos 
-// http. Asi ya podremos usar socketIO
-// en nuestro server.
-var io = socketIO(server);
 
 app.use(express.static(publicPath));
-// io.on sirve para escuchar un evento,
-// en este caso connection el cual espera
-// por una conexion y cuando recibe
-// el socket manda el mensaje. El socket 
-// es la conexión individual que cada 
-// cliente hace al server.
+
+var server = http.createServer(app);
+
+var io = socketIO(server);
+
+// io.on solo debe ser llamado una vez
 io.on('connection', (socket) => {
   console.log('New user connection')
-  // Le pasamos al socket que espere un evento
-  // disconnect, el cual indica que la pagina
-  // web ha sido cerrada
+  
+  // ---- from client to server ----
   socket.on('disconnect', () => {
     console.log('User was disconnected')
   })
+  // Recibimos el emit del cliente
+  socket.on('createEmail', (newEmail) => {
+    console.log('createEmail', newEmail);
+  });
+
+  socket.on('createMessage', (newMessage) => {
+    console.log('createMessage', newMessage);
+  });
+  // ---- from server to client ----
+  // emit sirve para emitir un envento al cliente
+  // se debe pasar el nombre del evento y la informacion
+  // que se requiera, en este caso un objeto.
+  socket.emit('newEmail', {
+    from: 'mike@example.com',
+    text: 'Hey. What is going on.',
+    createAt: 123
+  });
+
+  socket.emit('newMessage', {
+    from: 'alguien@example.com',
+    text: 'I sent you new message',
+    createAt: 456
+  })
 })
-// Cambiamos a server en lugar de app
-// ya que le pasamos la app. FUncionan
-// de la misma manera.
+
 server.listen(port, () => {
   console.log(`Server is running port ${port}`);
 })
