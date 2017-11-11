@@ -17,7 +17,7 @@ const app = express();
 // contenida en la const publicPath
 app.use(express.static(publicPath));
 
-app.listen(3000, () => {
+app.listen(port, () => {
   console.log(`Server is running port ${port}`);
 })
 
