@@ -21,13 +21,9 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User was disconnected')
   })
-  // recibimos como parametro ña funcion emitida 
-  // desde el cliente(callback)
   socket.on('createMessage', (message, callback) => {
     console.log('createMessage', message);     
     io.emit('newMessage', generateMessage(message.from, message.text));
-    // llamamos el callback y le pasamos un texto, el cual sera enviado
-    // como respuesta al cliente de que el server recibio el mensaje
     callback('This is from the server');
   });
   // ---- from server to client ----

@@ -8,8 +8,16 @@
 </head>
 <body>
   <p>Welcome to the ChatApp</p>
+  <!-- aqui es donde se mostraran los msjs -->
+  <ol id="messages"></ol>
+  <!-- formulario desde donde se enviaran los msjs -->
+  <form action="" id="message-form">
+    <input type="text" name="message" placeholder="Message"/>
+    <button>Send</button>
+  </form>
 
   <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/libs/jquery-3.2.1.min.js"></script>
   <script src="/js/index.js"></script>
 </body>
 </html>
