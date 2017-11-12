@@ -18,30 +18,34 @@ socket.on('newMessage', function (message){
 })
 
 // ---- from client to server ----
-// socket.emit('createMessage', {
-//   from: 'Frank',
-//   text: 'Something here'
-// }, function(data) {
-//   console.log('Got it', data);
-// });
-
-//con jquery seleccionamos el form con el id
-// #message-form y le pasamos el evento(.on)
-// submit 
 jQuery('#message-form').on('submit', function(e) {
-  // cancelamos la accion por defecto
-  // mandar el formulario via web
   e.preventDefault();
-  // emitimos el evento createMessage pasandole
-  // un objeto y sus datos.
+
   socket.emit('createMessage', {
     from: 'User',
-    // el text lo vamos a obtener del input
-    // en el form mediante el atributo name
-    // todo esto con jquery
     text: jQuery('[name=message]').val()
-    // le mandamos el callback, aunque no tenga nada
   }, function() {
     console.log('yeah')
+  })
+});
+// obtenemos el #send-location y le agregamos el
+// evento on le pasamos click y una funcion
+var locationButton = jQuery('#send-location');
+locationButton.on('click', function() {
+  if (!navigator.geolocation) {
+    return alert('Geolocation not supported by your browser.');
+  }
+  // navigator es un atributo que tienen los navegadores y mediante 
+  // el podemos obtener la posicion actual, la cual recibe una 2 funciones
+  // como parametro, una con los datos y otra por si falla
+  navigator.geolocation.getCurrentPosition(function (position) {
+    // emitimos el evento el cual pasara un objeto con los datos
+    socket.emit('createLocationMessage', {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude
+    })
+    // y aqui esta pro si falla
+  }, function () {
+    alert('Unable to fetch location')
   })
 });

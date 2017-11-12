@@ -26,6 +26,12 @@ io.on('connection', (socket) => {
     io.emit('newMessage', generateMessage(message.from, message.text));
     callback('This is from the server');
   });
+  // aqui esperamos el evento createLocationMessage y le 
+  // pasamos las coords que vienen del cliente
+  socket.on('createLocationMessage', (coords) => {
+    // lo emitimos a todos 
+    io.emit('newMessage', generateMessage('Admin', `${coords.latitude}, ${coords.longitude}`))
+  })
   // ---- from server to client ----
   socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
   socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
