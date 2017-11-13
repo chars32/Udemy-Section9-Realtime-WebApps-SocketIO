@@ -16,7 +16,7 @@ socket.on('newMessage', function (message){
 
   jQuery('#messages').append(li);
 })
-// escuchamos el newLocationMessage y usamos jquery
+
 socket.on('newLocationMessage', function (message) {
   var li = jQuery('<li></li>');
   var a = jQuery('<a target="_blank">My current location</a>');
@@ -32,31 +32,36 @@ socket.on('newLocationMessage', function (message) {
 jQuery('#message-form').on('submit', function(e) {
   e.preventDefault();
 
+  // debido a que el valor se repite creamos esta variable
+  var messageTextBox = jQuery('[name=message')
+
   socket.emit('createMessage', {
     from: 'User',
-    text: jQuery('[name=message]').val()
+    text: messageTextBox.val()
   }, function() {
-    console.log('yeah')
+    // con este callback dejamos en blanco el input
+    messageTextBox.val('')
   })
 });
-// obtenemos el #send-location y le agregamos el
-// evento on le pasamos click y una funcion
+
 var locationButton = jQuery('#send-location');
 locationButton.on('click', function() {
   if (!navigator.geolocation) {
     return alert('Geolocation not supported by your browser.');
   }
-  // navigator es un atributo que tienen los navegadores y mediante 
-  // el podemos obtener la posicion actual, la cual recibe una 2 funciones
-  // como parametro, una con los datos y otra por si falla
+  // cuando este buscando la location cambia el texto y se deshabilita
+  locationButton.attr('disabled', 'disabled').text('Sending location...')
+
   navigator.geolocation.getCurrentPosition(function (position) {
-    // emitimos el evento el cual pasara un objeto con los datos
+    // cambia el texto y se habilita
+    locationButton.removeAttr('disabled').text('Send location');
     socket.emit('createLocationMessage', {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude
-    })
-    // y aqui esta pro si falla
+    });
   }, function () {
+    // cambia el texto y se habilita
+    locationButton.removeAttr('disabled').text('Send location');
     alert('Unable to fetch location')
   })
 });

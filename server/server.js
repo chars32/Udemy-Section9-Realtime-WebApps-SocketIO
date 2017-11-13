@@ -24,12 +24,9 @@ io.on('connection', (socket) => {
   socket.on('createMessage', (message, callback) => {
     console.log('createMessage', message);     
     io.emit('newMessage', generateMessage(message.from, message.text));
-    callback('This is from the server');
+    callback();
   });
-  // aqui esperamos el evento createLocationMessage y le 
-  // pasamos las coords que vienen del cliente
   socket.on('createLocationMessage', (coords) => {
-    // lo emitimos a todos newLocationMessage y la funcion generateLocationMessage
     io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude))
   });
   // ---- from server to client ----
