@@ -19,18 +19,28 @@ app.use(express.static(publicPath));
 io.on('connection', (socket) => {
   console.log('New user connection')
   
-  // ---- from client to server ----
-  // escuchamos el evento join y recibimos los params
-  // y el callback .
+  // ---- from client to server ----.
   socket.on('join', (params, callback) => {
-    // si no se cumple la condicion del validador en alguna de las 
-    // propiedades del params
+
     if (!isRealString(params.name) || !isRealString(params.room)) {
-      // Regresamos el err para que se muestre en forma de alert
       callback('Name and room name are required.');
     }
 
-    // callback();
+    socket.join(params.room);
+
+    //io.emit <--- a todos los que esten conectados
+    //socket.broadcast.emit <--- lo manda a todos conectados al socket excepto al usuario que lo manda.
+    //socket.emit <--- manda el mensaje especificamente a un usuario.
+
+    // --- Para los rooms
+    //io.to('name room').emit <--- a todos los que esten conectados a ese room
+    //socket.broadcast.to('name room').emit <--- lo manda a todos conectados al socket del room excepto al usuario que lo manda.
+
+    // Movimos estos emit para que solo sean visto por las personas que estan en el room
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+    socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} hass joined`));
+    
+    callback();
   });
   socket.on('disconnect', () => {
     console.log('User was disconnected')
@@ -44,8 +54,8 @@ io.on('connection', (socket) => {
     io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude))
   });
   // ---- from server to client ----
-  socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
-  socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
+  // socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+  // socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
 })
 
 server.listen(port, () => {
