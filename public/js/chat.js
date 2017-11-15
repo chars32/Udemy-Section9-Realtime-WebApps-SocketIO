@@ -30,7 +30,7 @@ socket.on('connect', function () {
 socket.on('disconnect', function () {
   console.log('Disconnected from server')
 });
-// escuchamos el evento updateUserList y lo mandamos al html
+
 socket.on('updateUserList', function (users) {
   var ol = jQuery('<ol></ol>');
 
@@ -74,7 +74,8 @@ jQuery('#message-form').on('submit', function(e) {
   var messageTextBox = jQuery('[name=message')
 
   socket.emit('createMessage', {
-    from: 'User',
+    // eliminamos user por que ese lo manda el server.js
+    // por el user.name
     text: messageTextBox.val()
   }, function() {
     messageTextBox.val('')

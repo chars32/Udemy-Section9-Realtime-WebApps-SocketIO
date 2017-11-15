@@ -5,15 +5,12 @@ const socketIO = require('socket.io');
 
 const {generateMessage, generateLocationMessage} = require('./utils/message.js');
 const {isRealString} = require('./utils/validation');
-// Llamos a Users del archivo utils/users.js
 const {Users} = require('./utils/users');
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
 const app = express();
 var server = http.createServer(app);
 var io = socketIO(server);
-// instanciamos Users en la variable users
-// para asi poder usar sus metodos.
 var users = new Users();
 
 // Middleware
@@ -28,13 +25,10 @@ io.on('connection', (socket) => {
     if (!isRealString(params.name) || !isRealString(params.room)) {
       return callback('Name and room name are required.');
     }
-    // se une al room
+
     socket.join(params.room);
-    // eliminamos al user si esta en otro room.
     users.removeUser(socket.id);
-    // agregamos al user al room.
     users.addUser(socket.id, params.name, params.room);
-    // enviamos al room la lista actualizada.
     io.to(params.room).emit('updateUserList', users.getUserList(params.room));
 
     socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
@@ -43,23 +37,30 @@ io.on('connection', (socket) => {
     callback();
   });
   socket.on('disconnect', () => {
-    // eliminamos al usuario de la lista
     var user = users.removeUser(socket.id);
 
     if (user) {
-      // actualizamos la lista y la mandamos al room
       io.to(user.room).emit('updateUserList', users.getUserList(user.room));
-      // emitimos un nuevo mensaje de que ha salido dle room
       io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left`));
     }
   });
   socket.on('createMessage', (message, callback) => {
-    console.log('createMessage', message);     
-    io.emit('newMessage', generateMessage(message.from, message.text));
+    // obtenemos el usuario
+    var user = users.getUser(socket.id);
+    // checamos que exista el usuario y que el mensaje no venga vacio
+    if (user && isRealString(message.text)) {
+      // emitimos solo al room en el que se encuentre
+      io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+    }
+
     callback();
   });
   socket.on('createLocationMessage', (coords) => {
-    io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude))
+    // hacemos lo mismo que en createMessage
+    var user = users.getUser(socket.id);
+    if (user) {
+      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude))
+    }
   });
 })
 
