@@ -1,11 +1,8 @@
 var socket = io();
 
 function scrollToBottom () {
-  // Selectors
   var messages = jQuery('#messages');
   var newMessage = messages.children('li:last-child');
-  // Heights
-  // prop viene de jquery
   var clientHeight = messages.prop('clientHeight');
   var scrollTop = messages.prop('scrollTop');
   var scrollHeight = messages.prop('scrollHeight');
@@ -17,10 +14,9 @@ function scrollToBottom () {
   }
 }
 
+// ---- from server to client ----
 socket.on('connect', function () {
   var params = jQuery.deparam(window.location.search);
-  // emitimos un evento con nombre join el cual tiene 
-  // params y un callback como parametros.
   socket.emit('join', params, function (err) {
     if (err) {
       alert(err);
@@ -31,10 +27,19 @@ socket.on('connect', function () {
   });
 });
 
-// ---- from server to client ----
 socket.on('disconnect', function () {
   console.log('Disconnected from server')
 });
+// escuchamos el evento updateUserList y lo mandamos al html
+socket.on('updateUserList', function (users) {
+  var ol = jQuery('<ol></ol>');
+
+  users.forEach(function (user) {
+    ol.append(jQuery('<li></li>').text(user));
+  });
+
+  jQuery('#users').html(ol);
+})
 
 socket.on('newMessage', function (message){
   var formattedTime = moment(message.createdAt).format('h:mm a')
