@@ -17,6 +17,9 @@ function scrollToBottom () {
 // ---- from server to client ----
 socket.on('connect', function () {
   var params = jQuery.deparam(window.location.search);
+  // no importa si el nombre del room es en mayusculas o minusculas
+  // siempre llevara al mismo
+  params.room = params.room.toLowerCase();
   socket.emit('join', params, function (err) {
     if (err) {
       alert(err);

@@ -19,13 +19,13 @@ app.use(express.static(publicPath));
 // io.on solo debe ser llamado una vez
 io.on('connection', (socket) => {
   console.log('New user connection')
-  
+
   // ---- from client to server ----.
   socket.on('join', (params, callback) => {
     if (!isRealString(params.name) || !isRealString(params.room)) {
       return callback('Name and room name are required.');
     }
-
+    
     socket.join(params.room);
     users.removeUser(socket.id);
     users.addUser(socket.id, params.name, params.room);
