@@ -28,6 +28,17 @@ class Users {
 
     return namesArray;
   }
+  // Checa que el name de usuario no este repetido
+  checkUser (userName, room) {
+    var userList = this.getUserList(room)
+    
+    for (let name  of userList) {
+      if (name === userName) {
+        return true
+      }
+    }
+
+  }
 }
 
 module.exports = {Users};

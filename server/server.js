@@ -25,6 +25,10 @@ io.on('connection', (socket) => {
     if (!isRealString(params.name) || !isRealString(params.room)) {
       return callback('Name and room name are required.');
     }
+    // Verificamos que el nombre de usuario no este repetido
+    if (users.checkUser(params.name, params.room)) {
+      return callback('Name repeat')
+    }    
     
     socket.join(params.room);
     users.removeUser(socket.id);

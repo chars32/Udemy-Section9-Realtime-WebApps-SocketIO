@@ -75,4 +75,11 @@ describe('Users', () => {
 
     expect(userList).toEqual(['Mike', 'Julie']);
   })
+  // test para checar que el nombre del usuario no este repetido
+  it('should find name repeat', () => {
+    var userList = users.getUserList('Node Course');
+
+    expect(userList).toContain('Mike');
+
+  })
 });
